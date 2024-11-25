@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
+
 @RestController
 @RequestMapping("/api/file")
 public class StorageController {
@@ -34,5 +36,15 @@ public class StorageController {
     @DeleteMapping("/delete/{fileName}")
     public ResponseEntity<String> deleteFile(@PathVariable String fileName) {
         return new ResponseEntity<>(storageService.deleteFile(fileName), HttpStatus.OK);
+    }
+
+    @GetMapping("/generatePreSignedUrl/{fileName}")
+    public ResponseEntity<URL> getPreSignedUrl(@PathVariable String fileName) {
+        return new ResponseEntity<>(storageService.getPreSignedUrl(fileName), HttpStatus.OK);
+    }
+
+    @GetMapping("/listBuckets")
+    public ResponseEntity<String> listBuckets() {
+        return new ResponseEntity<>(storageService.listBuckets(), HttpStatus.OK);
     }
 }

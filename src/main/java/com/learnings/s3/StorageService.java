@@ -1,9 +1,8 @@
 package com.learnings.s3;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +13,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class StorageService {
@@ -47,6 +51,21 @@ public class StorageService {
     public String deleteFile(String fileName) {
         s3Client.deleteObject(bucketName, fileName);
         return fileName + " removed ...";
+    }
+
+    public URL getPreSignedUrl(String fileName) {
+        GeneratePresignedUrlRequest presignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, fileName, HttpMethod.GET);
+        Date expiration = new Date();
+        long expTime = expiration.getTime();
+        expTime = expTime + 1000 * 60 * 60;
+        expiration.setTime(expTime);
+        presignedUrlRequest.setExpiration(expiration);
+        return s3Client.generatePresignedUrl(presignedUrlRequest);
+    }
+
+    public String listBuckets(){
+        List<Bucket> buckets = s3Client.listBuckets();
+        return buckets.get(0).getName();
     }
 
     private File convertMultipartFileToFile(MultipartFile file) {
